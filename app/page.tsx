@@ -8,7 +8,7 @@ const themes = [
 
 async function getPrice() {
   try {
-    const res = await fetch("http://localhost:3000/api/price", {
+    const res = await fetch("/api/price", {
       cache: "no-store",
     });
 
