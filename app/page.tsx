@@ -6,21 +6,31 @@ const themes = [
   { name: "핀테크 / 결제", score: 64, change: "-1.2%" },
 ];
 
-async function getPrice() {
-  try {
-    const res = await fetch("/api/price", {
-      cache: "no-store",
-    });
+type PriceData = {
+  c: number; // current
+};
 
+async function getAaplPrice() {
+  const apiKey = process.env.FINNHUB_API_KEY;
+  if (!apiKey) return null;
+
+  const url = `https://finnhub.io/api/v1/quote?symbol=AAPL&token=${apiKey}`;
+
+  try {
+    const res = await fetch(url, { cache: "no-store" });
     if (!res.ok) return null;
-    return res.json();
+
+    const data: PriceData = await res.json();
+    if (typeof data.c !== "number") return null;
+
+    return data.c;
   } catch {
     return null;
   }
 }
 
 export default async function Home() {
-  const price = await getPrice();
+  const aaplPrice = await getAaplPrice();
 
   return (
     <main
@@ -51,7 +61,7 @@ export default async function Home() {
           }}
         >
           <strong>AAPL 실시간 가격:</strong>{" "}
-          {price ? `$${price.currentPrice}` : "불러오는 중/오류"}
+          {aaplPrice !== null ? `$${aaplPrice}` : "불러오는 중/오류"}
         </div>
 
         <div
